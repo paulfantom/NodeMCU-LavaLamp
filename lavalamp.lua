@@ -8,6 +8,7 @@ critical = 120
 function lampON()
     if temp < critical then
         gpio.write(lamp,gpio.HIGH)
+        tmr.alarm(2,21600000,0,lampOFF)
         state = 1
     else
         print("Temperature too high")
@@ -16,6 +17,7 @@ end
 
 function lampOFF()
     gpio.write(lamp,gpio.LOW)
+    tmr.stop(2)
     state = 0
 end
 
