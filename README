@@ -1,0 +1,36 @@
+                            Wifi Lava Lamp
+        
+Firmware: customized NodeMCU 0.9.5
+Compiler: eLua 0.9.0 cross-compiler
+Other software: NodeMCU Configuration Webpage
+
+Summary
+-------
+
+Lua based CoAP and HTTP server able to control one relay and take temperature 
+readings from DS18B20 thermometer.
+
+Installation
+------------
+Firstly flash ESP8266 with NodeMCU firmware from NodeMCU-firmware folder or 
+compile your own with those modules:
+    - node
+    - file
+    - gpio
+    - net
+    - wifi
+    - tmr
+    - uart
+    - bit
+    - ow
+    - coap
+For flashing instructions follow NodeMCU github.
+
+
+
+
+Licensing
+---------
+
+Please see the file called LICENSE
+
