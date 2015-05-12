@@ -51,6 +51,19 @@ all configuration files and will go into AP mode when turned ON.
 AP mode is better explained in NodeMCU-Configuration-Webpage readme
 
 
+Normal operation
+----------------
+
+When connected to network it serves static web page with two buttons (ON and 
+OFF) and current temperature readings in degrees Celsius.
+Also it creates CoAP server on port 5683 with three values (GET request):
+    - /v1/v/critical  - critical temperature
+    - /v1/v/temp      - current temperature
+    - /v1/v/state     - lamp relay state (ON or OFF)
+and one function (POST request)
+    - /v1/f/toggle      - change lamp relay state
+
+
 Licensing
 ---------
 
