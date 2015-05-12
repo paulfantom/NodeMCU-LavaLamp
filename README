@@ -45,8 +45,8 @@ serves configuration web page (@ http://192.168.1.1)
 
 After switching device ON it searches for previous network configuration 
 and if one is found it should turn lamp relay ON and OFF for ~10 seconds in 2 
-second intervals. If you switch device off in this 10s period it will delete 
-all configuration files and reset itself to factory defaults.
+second intervals. If you switch device OFF in this 10s period it will delete 
+all configuration files and will go into AP mode when turned ON.
 
 AP mode is better explained in NodeMCU-Configuration-Webpage readme
 
