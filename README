@@ -1,8 +1,9 @@
                             Wifi Lava Lamp
         
+MCU: ESP8266
 Firmware: customized NodeMCU 0.9.5
 Compiler: eLua 0.9.0 cross-compiler
-Other software: NodeMCU Configuration Webpage
+Other software: NodeMCU Configuration Webpage 
 
 Summary
 -------
@@ -39,7 +40,15 @@ You can do it using ESPlorer tool.
 Configuration
 -------------
 
-For configuration follow NodeMCU-Configuration-Webpage readme
+When first switching device ON it will go into Access Point mode in which it 
+serves configuration web page (@ http://192.168.1.1)
+
+After switching device ON it searches for previous network configuration 
+and if one is found it should turn lamp relay ON and OFF for ~10 seconds in 2 
+second intervals. If you switch device off in this 10s period it will delete 
+all configuration files and reset itself to factory defaults.
+
+AP mode is better explained in NodeMCU-Configuration-Webpage readme
 
 
 Licensing
