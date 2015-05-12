@@ -10,8 +10,10 @@ Summary
 Lua based CoAP and HTTP server able to control one relay and take temperature 
 readings from DS18B20 thermometer.
 
+
 Installation
 ------------
+
 Firstly flash ESP8266 with NodeMCU firmware from NodeMCU-firmware folder or 
 compile your own with those modules:
     - node
@@ -26,7 +28,18 @@ compile your own with those modules:
     - coap
 For flashing instructions follow NodeMCU github.
 
+Next upload to ESP8266 following files:
+    - init.lua
+    - binaries/lavalamp.lc
+    - binaries/ds18b20.lc
+    - NodeMCU-Configuration-Webpage/ap.lc
+You can do it using ESPlorer tool.
 
+
+Configuration
+-------------
+
+For configuration follow NodeMCU-Configuration-Webpage readme
 
 
 Licensing
