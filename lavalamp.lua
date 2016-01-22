@@ -2,13 +2,19 @@ collectgarbage()
 wifi.sta.autoconnect(1)
 lamp = 4
 thermometer = 3
-refresh_rate = 30000
-critical = 120
+critical = 105
+
+mqtt_host = "192.168.10.3"
+mqtt_pass = nil
+mqtt_user = nil
+
+state = 0
+temp = 85
 
 function lampON()
     if temp < critical then
+        print("lamp ON")
         gpio.write(lamp,gpio.HIGH)
-        tmr.alarm(2,21600000,0,lampOFF)
         state = 1
     else
         print("Temperature too high")
@@ -16,15 +22,26 @@ function lampON()
 end
 
 function lampOFF()
+    print("lamp OFF")
     gpio.write(lamp,gpio.LOW)
-    tmr.stop(2)
     state = 0
+end
+
+function toggle(payload)
+    print("change lamp state")
+    if gpio.read(lamp) == gpio.HIGH then
+        lampOFF()
+        return('0')
+    else
+        lampON()
+        return('1')
+    end
 end
 
 function gettemp()
     t=require("ds18b20")
     t.setup(thermometer)
-    temp=t.read(nil,t.C)
+    temp=t.read()
     if temp == nil then
         temp = 0
     end
@@ -38,64 +55,50 @@ function gettemp()
     package.loaded["ds18b20"]=nil
 end
 
-function toggle(payload)
-    --TODO broadcast via CoAP
-    print("change lamp state")
-    if gpio.read(lamp) == gpio.HIGH then
-        lampOFF()
-        return('0')
+function checkConn()
+    local s = wifi.sta.status()
+    if (s < 5) then
+        file.open('reconn.lock','w+')
+        file.write(state)
+        file.flush()
+        file.close()
+        node.restart()
     else
-        lampON()
-        return('1')
+        file.remove("reconn.lock")
     end
 end
 
-state = 0
-temp = 0.0
-
 gpio.mode(lamp,gpio.OUTPUT)
 lampOFF()
-gettemp()
-tmr.alarm(0,refresh_rate,1,gettemp)
-refresh_rate = nil
+--gettemp()
+--tmr.alarm(3,30000,1,gettemp)
+tmr.alarm(4,60000,1,checkConn)
 
-print('starting CoAP server')
-cs = coap.Server()
-cs:listen(5683)
+print('connecting to MQTT')
+--m = mqtt.Client("LavaLamp_"..node.chipid(), 120, mqtt_pass, mqtt_user)
+m = mqtt.Client("Lava_"..node.chipid(), 120)
+m:connect("192.168.10.3", 1883, 0, function()
+    print("connected")
+    m:subscribe("/lavalamp/change",0)
 
-cs:func("toggle")
---TODO observable resource 'state'
-cs:var("state")
---TODO observable resource 'temp'
-cs:var("temp")
-cs:var("critical")
-
-print('starting HTTP server')
-srv=net.createServer(net.TCP,30)
-srv:listen(80,function(conn)
-    conn:on("receive", function(client,request)
-        local buf = "";
-        local _, _, method, path, vars = string.find(request, "([A-Z]+) (.+)?(.+) HTTP");
-        if(method == nil)then
-            _, _, method, path = string.find(request, "([A-Z]+) (.+) HTTP");
-        end
-        local _GET = {}
-        if (vars ~= nil)then
-            for k, v in string.gmatch(vars, "(%w+)=(%w+)&*") do
-                _GET[k] = v
-            end
-        end
-        buf = buf.."<h1> Lava Lamp</h1>";
-        buf = buf.."<p>Turn light <a href=\"?pin=ON\"><button>ON</button></a>&nbsp;<a href=\"?pin=OFF\"><button>OFF</button></a></p>";
-        buf = buf.."<p>Temperature: "..string.format("%2.2f", temp).." C</p>";
-        local _on,_off = "",""
-        if(_GET.pin == "ON")then
-              lampON();
-        elseif(_GET.pin == "OFF")then
-              lampOFF();
-        end
-        client:send(buf);
-        client:close();
-        collectgarbage();
+    tmr.alarm(5, 120000, 1, function()
+        gettemp()
+        m:publish("/lavalamp/temerature", tostring(temp), 0, 1)
     end)
+end)
+
+m:on("message", function(conn, topic, data)
+    if (data == "on" ) then
+        lampON()
+    end
+    if (data == "off" ) then
+        lampOFF()
+    end
+    if (data == "toggle" ) then
+        toggle()
+    end
+    if (data ~= nil ) then
+        print(topic .. ":" .. data )
+        m:publish("/lavalamp", "{state:"..tostring(state).."temperature:"..tostring(temp).."}", 0, 1)
+    end
 end)
