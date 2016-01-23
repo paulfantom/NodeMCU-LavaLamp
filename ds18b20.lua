@@ -115,7 +115,7 @@ function readNumber(addr, unit)
         else
           return nil
         end
-        t = t / 10000
+        --t = t / 10000
         return t
       end
       tmr.wdclr()

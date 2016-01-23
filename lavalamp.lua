@@ -2,7 +2,8 @@ collectgarbage()
 wifi.sta.autoconnect(1)
 lamp = 4
 thermometer = 3
-critical = 105
+-- 105 deg C
+critical = 105000
 
 mqtt_host = "192.168.10.3"
 mqtt_pass = nil
@@ -55,29 +56,22 @@ function gettemp()
     package.loaded["ds18b20"]=nil
 end
 
-function checkConn()
+tmr.alarm(4,60000,1,function()
     local s = wifi.sta.status()
     if (s < 5) then
-        file.open('reconn.lock','w+')
-        file.write(state)
-        file.flush()
-        file.close()
         node.restart()
-    else
-        file.remove("reconn.lock")
     end
-end
+end)
 
 gpio.mode(lamp,gpio.OUTPUT)
 lampOFF()
 --gettemp()
 --tmr.alarm(3,30000,1,gettemp)
-tmr.alarm(4,60000,1,checkConn)
 
 print('connecting to MQTT')
 --m = mqtt.Client("LavaLamp_"..node.chipid(), 120, mqtt_pass, mqtt_user)
 m = mqtt.Client("Lava_"..node.chipid(), 120)
-m:connect("192.168.10.3", 1883, 0, function()
+m:connect(mqtt_host, 1883, 0, function()
     print("connected")
     m:subscribe("/lavalamp/change",0)
 
