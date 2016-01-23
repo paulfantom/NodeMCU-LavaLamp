@@ -4,6 +4,7 @@
 -- LICENCE: http://opensource.org/licenses/MIT
 -- Vowstar <vowstar@nodemcu.com>
 -- 2015/02/14 sza2 <sza2trash@gmail.com> Fix for negative values
+-- modified by paulfantom <paulfantom@gmail.com> no floats, no F 
 --------------------------------------------------------------------------------
 
 -- Set module name as parameter of require
