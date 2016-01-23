@@ -1,22 +1,19 @@
                             Wifi Lava Lamp
         
-MCU: ESP8266
-Firmware: customized NodeMCU 0.9.5
-Compiler: eLua 0.9.0 cross-compiler
-Other software: NodeMCU Configuration Webpage 
+MCU: ESP8266-01
 
 Summary
 -------
 
-Lua based CoAP and HTTP server able to control one relay and take temperature 
+Lua based MQTT client able to control one relay and take temperature 
 readings from DS18B20 thermometer.
 
 
 Installation
 ------------
 
-Firstly flash ESP8266 with NodeMCU firmware from NodeMCU-firmware folder or 
-compile your own with those modules:
+Firstly flash ESP8266 with NodeMCU firmware from NodeMCU-firmware folder
+or compile your own with those modules:
     - node
     - file
     - gpio
@@ -24,17 +21,16 @@ compile your own with those modules:
     - wifi
     - tmr
     - uart
-    - bit
     - ow
-    - coap
+    - mqtt
 For flashing instructions follow NodeMCU github.
 
 Next upload to ESP8266 following files:
     - init.lua
-    - binaries/lavalamp.lc
-    - binaries/ds18b20.lc
-    - NodeMCU-Configuration-Webpage/ap.lc
-You can do it using ESPlorer tool.
+    - lavalamp.lua
+    - ds18b20.lua
+    - setwifi.lua
+You can do it using ESPlorer tool or esptool.py.
 
 
 Configuration
@@ -43,29 +39,18 @@ Configuration
 When first switching device ON it will go into Access Point mode in which it 
 serves configuration web page (@ http://192.168.1.1)
 
-After switching device ON it searches for previous network configuration 
-and if one is found it should turn lamp relay ON and OFF for ~10 seconds in 2 
-second intervals. If you switch device OFF in this 10s period it will delete 
-all configuration files and will go into AP mode when turned ON.
-
-AP mode is better explained in NodeMCU-Configuration-Webpage readme
-
-
 Normal operation
 ----------------
 
-When connected to network it serves static web page with two buttons (ON and 
-OFF) and current temperature readings in degrees Celsius.
-Also it creates CoAP server on port 5683 with three values (GET request):
-    - /v1/v/critical  - critical temperature
-    - /v1/v/temp      - current temperature
-    - /v1/v/state     - lamp relay state (ON or OFF)
-and one function (POST request)
-    - /v1/f/toggle      - change lamp relay state
+When connected to network provides MQTT hooks for changing state and 
+showing current temperature readings in degrees Celsius.
+    - /lavalamp             - JSON with current state
+    - /lavalamp/critical    - critical temperature (not implemented)
+    - /lavalamp/temperature - current temperature
+    - /lavalamp/change      - change lamp relay state (on, off, toggle)
 
 
 Licensing
 ---------
 
 Please see the file called LICENSE
-
