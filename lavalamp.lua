@@ -77,7 +77,7 @@ m:connect(mqtt_host, 1883, 0, function()
 
     tmr.alarm(5, 120000, 1, function()
         gettemp()
-        m:publish("/lavalamp/temerature", tostring(temp), 0, 1)
+        m:publish("/lavalamp/temperature", string.gsub(tostring(temp),"%d%d%d$",".%1"), 0, 1)
     end)
 end)
 
